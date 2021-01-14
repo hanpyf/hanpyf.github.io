@@ -1,0 +1,81 @@
+示例 1：
+
+输入：nums = [3,0,1]
+输出：2
+解释：n = 3，因为有 3 个数字，所以所有的数字都在范围 [0,3] 内。2 是丢失的数字，因为它没有出现在 nums 中。
+示例 2：
+
+输入：nums = [0,1]
+输出：2
+解释：n = 2，因为有 2 个数字，所以所有的数字都在范围 [0,2] 内。2 是丢失的数字，因为它没有出现在 nums 中。
+题目来源：https://leetcode-cn.com/problems/missing-number/
+所有方法必要代码：'int len=nums.size();'
+
+
+##数学
+        int sum=0;
+        for(int i=0;i<len;i++){
+            sum+=nums[i];
+        }
+        return (len+1)*len/2-sum;
+*这种就是纯数学法：1.等差数列前n项和-当前和=缺失的那个数字*
+
+##改进版防溢出数学
+        int sum=len;       //这个地方需要注意sum的初始值，可理解为下标减元素，下标少一个，但元素不少
+        for(int i=0;i<len;i++){
+            sum+=i;
+            sum-=nums[i];
+        }
+        return sum;
+*2.不用额外的空间，就按顺序求和每加一个数，然后马上减去一个数；这里有个巧妙的地方:初始和不是0，而是从最后一个最大的数开始的；这种way还可以防溢出*
+
+##无敌暴力排序找缺，像这个就一定要注意边界的情况，是无法通过减一判别出来的
+for(int i=0;i<len-1;i++){
+            for(int j=i+1;j<len;j++){
+                if(nums[i]>nums[j]){
+                    int t=nums[i];
+                    nums[i]=nums[j];
+                    nums[j]=t;
+                }
+        }
+    }
+    if(nums[0]!=0) return 0;
+    else if(nums[len-1]!=len) return len;
+    else{
+    int i;
+    for(i=1;i<len;i++){
+        if(nums[i]-nums[i-1]!=1){
+            break;
+        }
+    }
+    return (nums[i]-1);
+    }
+    *3.学到的排序算法是：先排序，然后判断0和最大的缺不缺，不缺就遍历数组，后一个数-前一个数>1，就中间那个缺*
+    
+    ##hash标记法
+    int *hash=(int*)malloc(sizeof(int)*(len+1));//此处注意越界的问题+1,hash得准备所有值的标记，空的那个位置也要有个位置
+    for(int i=0;i<len;i++){
+        hash[nums[i]]=1;
+    }
+    int j;
+    for(j=0;j<len;j++){
+        if(hash[j]!=1){
+            return j;
+        }
+    }
+    return j;
+    *4.hash查询每个数出现过没，我的标记法，申请一个hash表，标记出现的为1，再遍历一遍，返回0的那个*
+    
+    ##异或法
+    int res=len;        //注意初始值因为用完整下标去抵消的时候，下标少了最大值，补上去
+    for(int i=0;i<len;i++){
+        res^=i^nums[i];
+    }
+    return res;
+   ##### 5.异或开心消消乐法：异或规则，任何数与0异或为本身，与1异或为非。
+
+<img src="C:\Users\asus\AppData\Roaming\Typora\typora-user-images\image-20210114160544655.png" alt="image-20210114160544655" style="zoom: 67%;" />
+
+[0,4]0,1,2,3,4下标补一个最大数4，然后来和数组元素消消乐，多余那个就是的       
+        
+        
